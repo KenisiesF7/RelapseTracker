@@ -6,216 +6,275 @@
   <meta name="theme-color" content="#121212">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Foul Tracker">
-  
-  <title>Foul Tracker Pro</title>
+  <title>Foul Tracker</title>
 
-  <!-- External Resources -->
   <link rel="manifest" id="manifest-placeholder">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
       --bg-color: #121212;
-      --card-bg: #1e1e1e;
-      --text-color: #e0e0e0;
-      --accent-color: #4CAF50;
-      --baseline-color: #888888;
-      --rolling-color: #2196F3;
-      --danger-color: #f44336;
+      --card-bg: rgba(30, 30, 30, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f0f0f0;
+      --text-muted: #aaaaaa;
+      --accent-green: #4CAF50;
+      --accent-blue: #2196F3;
+      --accent-baseline: #888888;
+      --accent-red: #ff5252;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
 
     body {
       background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      color: var(--text-main);
       min-height: 100vh;
       padding: 16px;
+      display: flex;
+      justify-content: center;
     }
 
-    .container {
+    .app-container {
       width: 100%;
-      max-width: 900px;
+      max-width: 960px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
+    /* Top Bar */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      padding: 16px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
     }
 
     h1 {
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       font-weight: 600;
+      letter-spacing: -0.5px;
     }
 
-    .actions {
+    .header-actions {
       display: flex;
       gap: 8px;
     }
 
-    button {
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      border: 1px solid #333;
+    /* Circular / Glass Buttons */
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
       padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
       font-weight: 500;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       transition: all 0.2s ease;
     }
 
-    button:active {
-      transform: scale(0.97);
+    .btn:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.12);
     }
 
-    button.primary {
-      background-color: var(--accent-color);
+    .btn-primary {
+      background: var(--accent-green);
       color: #000;
-      border: none;
       font-weight: 600;
+      border: none;
     }
 
-    .dashboard-grid {
+    .btn-danger {
+      background: rgba(255, 82, 82, 0.15);
+      color: var(--accent-red);
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    /* Dashboard Stats */
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 12px;
     }
 
     .stat-card {
-      background-color: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      padding: 18px;
+      border-radius: 16px;
       text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
-    .stat-card .label {
-      font-size: 0.8rem;
-      color: #aaa;
-      margin-bottom: 4px;
+    .stat-label {
+      font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
-    .stat-card .value {
-      font-size: 1.5rem;
+    .stat-value {
+      font-size: 1.8rem;
       font-weight: 700;
     }
 
-    .chart-container {
-      position: relative;
-      background-color: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
-      height: 60vh;
-      min-height: 350px;
-      width: 100%;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .log-panel {
-      background-color: var(--card-bg);
-      padding: 16px;
-      border-radius: 12px;
+    /* Log Entry Section */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      padding: 20px;
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .input-group {
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .input-row {
       display: flex;
       gap: 10px;
     }
 
-    input[type="number"] {
-      flex: 1;
-      background-color: #2a2a2a;
-      border: 1px solid #444;
+    input[type="number"], input[type="file"] {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
       color: #fff;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
       font-size: 1rem;
+      width: 100%;
     }
 
-    /* Rotation Prompt Hint */
-    .orientation-hint {
+    /* Translucent Chart Containers */
+    .chart-box {
+      position: relative;
+      width: 100%;
+      height: 380px;
+    }
+
+    /* Data Tools Toolbar */
+    .tools-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    #fileInput {
       display: none;
-      font-size: 0.8rem;
-      color: #888;
-      text-align: center;
-      margin-top: -8px;
     }
 
-    @media (orientation: portrait) {
-      .orientation-hint {
-        display: block;
-      }
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="app-container">
+
+    <!-- Header -->
     <header>
-      <h1>🏀 Foul Tracker Pro</h1>
-      <div class="actions">
-        <button id="alertBtn" onclick="requestNotificationPermission()">🔔 Alerts</button>
-        <button class="primary" id="installBtn" style="display:none;" onclick="installPWA()">📲 Install App</button>
+      <h1>Foul Tracker</h1>
+      <div class="header-actions">
+        <button class="btn" id="alertBtn" onclick="requestNotificationPermission()">🔔 Alerts</button>
+        <button class="btn btn-primary hidden" id="installBtn" onclick="installPWA()">📲 Install</button>
       </div>
     </header>
 
-    <div class="dashboard-grid">
+    <!-- Stats Dashboard -->
+    <div class="stats-grid">
       <div class="stat-card">
-        <div class="label">Total Fouls</div>
-        <div class="value" id="totalFoulsVal" style="color: var(--accent-color);">0</div>
+        <div class="stat-label">Total Fouls</div>
+        <div class="stat-value" id="totalFoulsVal" style="color: var(--accent-green);">0</div>
       </div>
       <div class="stat-card">
-        <div class="label">Overall Daily Avg</div>
-        <div class="value" id="overallAvgVal" style="color: var(--baseline-color);">0.0</div>
+        <div class="stat-label">Overall Daily Avg</div>
+        <div class="stat-value" id="overallAvgVal" style="color: var(--accent-baseline);">0.00</div>
       </div>
       <div class="stat-card">
-        <div class="label">7-Day Rolling Avg</div>
-        <div class="value" id="rollingAvgVal" style="color: var(--rolling-color);">0.0</div>
+        <div class="stat-label">7-Day Rolling Avg</div>
+        <div class="stat-value" id="rollingAvgVal" style="color: var(--accent-blue);">0.00</div>
       </div>
     </div>
 
-    <div class="log-panel">
-      <h3>Log Today's Fouls</h3>
-      <div class="input-group">
+    <!-- Quick Log Panel -->
+    <div class="card">
+      <div class="card-title">Log Daily Count</div>
+      <div class="input-row">
         <input type="number" id="foulInput" min="0" value="0" placeholder="Number of fouls">
-        <button class="primary" onclick="logTodayFouls()">Save Log</button>
+        <button class="btn btn-primary" onclick="logFouls()">Save Entry</button>
       </div>
     </div>
 
-    <div class="chart-container">
-      <canvas id="foulChart"></canvas>
+    <!-- Main Cumulative & Rolling Average Timeline Chart -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Cumulative Progress & Rolling Trend</div>
+      </div>
+      <div class="chart-box">
+        <canvas id="mainChart"></canvas>
+      </div>
     </div>
-    <div class="orientation-hint">💡 Rotate device to landscape for an expanded chart view.</div>
+
+    <!-- Weekly Breakdown Chart -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Weekly Foul Breakdown</div>
+      </div>
+      <div class="chart-box">
+        <canvas id="weeklyChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Data Import / Export & Reset Tools -->
+    <div class="card">
+      <div class="card-title">Data Options & Backup</div>
+      <div class="tools-row">
+        <button class="btn" onclick="exportData()">📥 Export JSON</button>
+        <button class="btn" onclick="document.getElementById('fileInput').click()">📤 Import JSON</button>
+        <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+        <button class="btn btn-danger" onclick="resetData()">🗑️ Reset All</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // --- 1. DYNAMIC MANIFEST & ORIENTATION UNLOCK ---
+    // --- 1. ORIENTATION & PWA MANIFEST INJECTION ---
     const dynamicManifest = {
-      "name": "Foul Tracker Pro",
-      "short_name": "Foul Tracker",
+      "name": "Foul Tracker",
+      "short_name": "FoulTracker",
       "start_url": "./index.html",
       "display": "standalone",
       "orientation": "any",
@@ -223,67 +282,67 @@
       "theme_color": "#121212",
       "icons": [
         {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>",
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>",
           "sizes": "192x192 512x512",
           "type": "image/svg+xml"
         }
       ]
     };
-    const stringManifest = JSON.stringify(dynamicManifest);
-    const blob = new Blob([stringManifest], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(blob);
-    document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+    const manifestBlob = new Blob([JSON.stringify(dynamicManifest)], { type: 'application/json' });
+    document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(manifestBlob));
 
-    // Force system screen orientation unlock on window load and touch
-    function forceOrientationUnlock() {
+    function unlockOrientation() {
       if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock().catch(() => {
-          // System lock active or browser restriction handled
-        });
+        screen.orientation.unlock().catch(() => {});
       }
     }
-    window.addEventListener('load', forceOrientationUnlock);
-    window.addEventListener('orientationchange', forceOrientationUnlock);
-    document.addEventListener('touchstart', forceOrientationUnlock, { once: true });
+    window.addEventListener('load', unlockOrientation);
+    window.addEventListener('orientationchange', unlockOrientation);
+    document.addEventListener('touchstart', unlockOrientation, { once: true });
 
 
-    // --- 2. DATA STORAGE & INITIALIZATION ---
-    let foulLogs = JSON.parse(localStorage.getItem('foulLogs_v2')) || [1, 2, 0, 1, 3, 0, 0, 2, 4, 1, 0, 0, 1, 2];
+    // --- 2. STATE MANAGEMENT & STORAGE ---
+    const STORAGE_KEY = 'foul_tracker_logs_v3';
+    let foulLogs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [1, 0, 2, 1, 0, 3, 0, 1, 2, 0, 0, 1, 4, 0];
 
     function saveLogs() {
-      localStorage.setItem('foulLogs_v2', JSON.stringify(foulLogs));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(foulLogs));
     }
 
-    function logTodayFouls() {
+    function logFouls() {
       const input = document.getElementById('foulInput');
-      const val = parseInt(input.value) || 0;
-      foulLogs.push(val);
-      saveLogs();
-      updateDashboard();
+      const val = parseInt(input.value);
+      if (!isNaN(val) && val >= 0) {
+        foulLogs.push(val);
+        saveLogs();
+        input.value = '0';
+        renderApp();
+      }
     }
 
 
-    // --- 3. CHART & DASHBOARD RENDERER ---
-    let myChart = null;
+    // --- 3. CHARTS RENDERING ---
+    let mainChartInstance = null;
+    let weeklyChartInstance = null;
 
-    function updateDashboard() {
+    function renderApp() {
       const totalFouls = foulLogs.reduce((a, b) => a + b, 0);
       const totalDays = foulLogs.length || 1;
       const overallAvg = totalFouls / totalDays;
 
-      // Calculate recent 7-day average
-      const recentSlice = foulLogs.slice(-7);
-      const recentAvg = recentSlice.reduce((a, b) => a + b, 0) / recentSlice.length;
+      const trailingSlice = foulLogs.slice(-7);
+      const rollingAvg = trailingSlice.reduce((a, b) => a + b, 0) / trailingSlice.length;
 
       document.getElementById('totalFoulsVal').innerText = totalFouls;
       document.getElementById('overallAvgVal').innerText = overallAvg.toFixed(2);
-      document.getElementById('rollingAvgVal').innerText = recentAvg.toFixed(2);
+      document.getElementById('rollingAvgVal').innerText = rollingAvg.toFixed(2);
 
-      renderChart(foulLogs, overallAvg);
+      renderMainChart(overallAvg);
+      renderWeeklyChart();
     }
 
-    function renderChart(logs, currentOverallAvg) {
-      const ctx = document.getElementById('foulChart').getContext('2d');
+    function renderMainChart(currentOverallAvg) {
+      const ctx = document.getElementById('mainChart').getContext('2d');
 
       const labels = [];
       const cumulativeData = [];
@@ -292,29 +351,27 @@
 
       let runningTotal = 0;
 
-      logs.forEach((dailyCount, index) => {
-        const dayNum = index + 1;
+      foulLogs.forEach((count, idx) => {
+        const dayNum = idx + 1;
         labels.push(`Day ${dayNum}`);
 
-        // 1. Cumulative Actual Line
-        runningTotal += dailyCount;
+        // 1. Cumulative actual line
+        runningTotal += count;
         cumulativeData.push(runningTotal);
 
-        // 2. Retrospective Baseline Projection
+        // 2. Baseline line
         baselineData.push(Number((currentOverallAvg * dayNum).toFixed(2)));
 
-        // 3. 7-Day Rolling Average (Fouls/Day over trailing 7 days)
-        const windowStart = Math.max(0, index - 6);
-        const windowSlice = logs.slice(windowStart, index + 1);
-        const windowAvg = windowSlice.reduce((a, b) => a + b, 0) / windowSlice.length;
-        rollingAvgData.push(Number(windowAvg.toFixed(2)));
+        // 3. 7-Day Rolling Average
+        const windowStart = Math.max(0, idx - 6);
+        const slice = foulLogs.slice(windowStart, idx + 1);
+        const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
+        rollingAvgData.push(Number(avg.toFixed(2)));
       });
 
-      if (myChart) {
-        myChart.destroy();
-      }
+      if (mainChartInstance) mainChartInstance.destroy();
 
-      myChart = new Chart(ctx, {
+      mainChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
@@ -323,26 +380,26 @@
               label: 'Cumulative Fouls',
               data: cumulativeData,
               borderColor: '#4CAF50',
-              backgroundColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
               borderWidth: 3,
+              fill: true,
               tension: 0.1,
               yAxisID: 'y'
             },
             {
-              label: 'Overall Baseline',
+              label: 'Baseline Projection',
               data: baselineData,
               borderColor: '#888888',
-              borderDash: [6, 6],
+              borderDash: [5, 5],
               borderWidth: 2,
               pointRadius: 0,
-              tension: 0,
               yAxisID: 'y'
             },
             {
               label: '7-Day Rolling Avg (Fouls/Day)',
               data: rollingAvgData,
               borderColor: '#2196F3',
-              backgroundColor: 'rgba(33, 150, 243, 0.1)',
+              backgroundColor: 'rgba(33, 150, 243, 0.08)',
               borderWidth: 2,
               tension: 0.3,
               fill: true,
@@ -353,43 +410,123 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: {
-            mode: 'index',
-            intersect: false
-          },
+          interaction: { mode: 'index', intersect: false },
           scales: {
             x: {
-              grid: { color: '#2a2a2a' },
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
               ticks: { color: '#aaa' }
             },
             y: {
               type: 'linear',
-              display: true,
               position: 'left',
-              title: { display: true, text: 'Total Cumulative Fouls', color: '#4CAF50' },
-              grid: { color: '#2a2a2a' },
-              ticks: { color: '#aaa' }
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#aaa' },
+              title: { display: true, text: 'Cumulative Total', color: '#4CAF50' }
             },
             y1: {
               type: 'linear',
-              display: true,
               position: 'right',
-              title: { display: true, text: 'Daily Rate (Rolling Avg)', color: '#2196F3' },
               grid: { drawOnChartArea: false },
-              ticks: { color: '#aaa' }
+              ticks: { color: '#aaa' },
+              title: { display: true, text: 'Daily Rate (Rolling Avg)', color: '#2196F3' }
             }
           },
           plugins: {
-            legend: {
-              labels: { color: '#e0e0e0', usePointStyle: true }
-            }
+            legend: { labels: { color: '#f0f0f0', usePointStyle: true } }
+          }
+        }
+      });
+    }
+
+    function renderWeeklyChart() {
+      const ctx = document.getElementById('weeklyChart').getContext('2d');
+
+      // Group logs into 7-day chunks (Week 1, Week 2, etc.)
+      const weeklyTotals = [];
+      const labels = [];
+      
+      for (let i = 0; i < foulLogs.length; i += 7) {
+        const weekSlice = foulLogs.slice(i, i + 7);
+        const sum = weekSlice.reduce((a, b) => a + b, 0);
+        const weekNum = Math.floor(i / 7) + 1;
+        labels.push(`Week ${weekNum}`);
+        weeklyTotals.push(sum);
+      }
+
+      if (weeklyChartInstance) weeklyChartInstance.destroy();
+
+      weeklyChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total Fouls per Week',
+            data: weeklyTotals,
+            backgroundColor: 'rgba(33, 150, 243, 0.4)',
+            borderColor: '#2196F3',
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#aaa' } },
+            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#aaa' }, beginAtZero: true }
+          },
+          plugins: {
+            legend: { labels: { color: '#f0f0f0' } }
           }
         }
       });
     }
 
 
-    // --- 4. SERVICE WORKER & PWA INSTALL HANDLER ---
+    // --- 4. DATA IMPORT, EXPORT & RESET ---
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(foulLogs, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `foul_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            foulLogs = imported;
+            saveLogs();
+            renderApp();
+            alert("Data imported successfully!");
+          } else {
+            alert("Invalid format. Please upload a JSON file with an array of log numbers.");
+          }
+        } catch (err) {
+          alert("Error reading JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetData() {
+      if (confirm("Are you sure you want to delete all foul logs? This action cannot be undone.")) {
+        foulLogs = [];
+        saveLogs();
+        renderApp();
+      }
+    }
+
+
+    // --- 5. PWA INSTALL & NOTIFICATIONS ---
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
@@ -398,7 +535,7 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      document.getElementById('installBtn').style.display = 'inline-block';
+      document.getElementById('installBtn').classList.remove('hidden');
     });
 
     function installPWA() {
@@ -406,7 +543,7 @@
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(() => {
           deferredPrompt = null;
-          document.getElementById('installBtn').style.display = 'none';
+          document.getElementById('installBtn').classList.add('hidden');
         });
       }
     }
@@ -414,15 +551,15 @@
     function requestNotificationPermission() {
       if ('Notification' in window) {
         Notification.requestPermission().then(permission => {
-          alert(`Notification permission: ${permission}`);
+          alert(`Notifications: ${permission}`);
         });
       } else {
-        alert('Notifications not supported on this browser.');
+        alert('Notifications not supported by this browser.');
       }
     }
 
-    // Initial Launch Render
-    updateDashboard();
+    // Initial Launch
+    renderApp();
   </script>
 </body>
 </html>
