@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Foul Tracker Pro - Dynamic Analytics</title>
 
   <!-- PWA Headers & Manifest Link -->
@@ -17,7 +17,8 @@
   <style>
     :root {
       --bg-dark: #0f172a;
-      --card-bg: #1e293b;
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent-green: #10b981;
@@ -39,7 +40,7 @@
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 16px;
-      border-bottom: 1px solid #334155;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       flex-wrap: wrap;
       gap: 12px;
     }
@@ -47,7 +48,9 @@
     .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
     
     .motivation-banner {
-      background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+      background: linear-gradient(135deg, rgba(6, 95, 70, 0.8) 0%, rgba(4, 120, 87, 0.8) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border: 1px solid #10b981;
       border-radius: 10px;
       padding: 14px 20px;
@@ -68,9 +71,11 @@
     }
     .card {
       background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 20px;
       border-radius: 12px;
-      border: 1px solid #334155;
+      border: 1px solid var(--card-border);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
     .card-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -79,9 +84,11 @@
 
     .log-section {
       background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 20px;
       border-radius: 12px;
-      border: 1px solid #334155;
+      border: 1px solid var(--card-border);
       margin-bottom: 24px;
     }
     .btn-foul {
@@ -101,21 +108,22 @@
     
     .btn-util {
       padding: 8px 14px;
-      border: 1px solid #475569;
-      border-radius: 6px;
-      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
       color: #f8fafc;
       font-size: 0.85rem;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .btn-util:hover { background: #334155; }
+    .btn-util:hover { background: rgba(255, 255, 255, 0.12); }
     .btn-notify { background: var(--accent-gold); color: #0f172a; font-weight: bold; border: none; }
     .btn-install { background: var(--accent-blue); color: white; font-weight: bold; border: none; display: none; }
-    .btn-danger { background: var(--accent-red); color: white; font-weight: bold; border: none; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); font-weight: bold; }
 
     .tag-select, .note-input {
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
       color: white;
       padding: 10px;
       border-radius: 6px;
@@ -130,7 +138,7 @@
     }
     
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.9rem; }
     th { color: var(--text-muted); }
   </style>
 </head>
@@ -198,9 +206,9 @@
     <button class="btn-foul" onclick="logFoul()">+1 Foul (Log Instant)</button>
   </div>
 
-  <!-- Combined Cumulative Line + Incident Bar Chart -->
+  <!-- Combined Cumulative Line + Incident Bar Chart + 7-Day Dynamic Rate of Change -->
   <div class="card" style="margin-bottom: 24px;">
-    <div class="card-title">2026 Cumulative Timeline (Line) & Daily Additions (Bottom 1/3 Bars)</div>
+    <div class="card-title">2026 Cumulative Total (Green), Overall Baseline (Gray), 7-Day Rate of Change (Blue), & Daily Incidents (Bottom Bars)</div>
     <div class="chart-container">
       <canvas id="cumulativeChart"></canvas>
     </div>
@@ -245,6 +253,16 @@
 let logs = [];
 let cumChart, dowChart, todChart;
 let deferredPrompt = null;
+
+// Screen Orientation Fix
+function unlockOrientation() {
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock().catch(() => {});
+  }
+}
+window.addEventListener('load', unlockOrientation);
+window.addEventListener('orientationchange', unlockOrientation);
+document.addEventListener('touchstart', unlockOrientation, { once: true });
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
@@ -463,7 +481,7 @@ function updateTable() {
     tr.innerHTML = `
       <td>${formatLocalTimestamp(item)}</td>
       <td><strong>+1</strong></td>
-      <td><span style="background:#334155; padding: 2px 8px; border-radius: 4px;">${item.tag}</span></td>
+      <td><span style="background:rgba(255, 255, 255, 0.1); padding: 2px 8px; border-radius: 4px;">${item.tag}</span></td>
       <td>${item.note || '-'}</td>
     `;
     tbody.appendChild(tr);
@@ -495,6 +513,25 @@ function renderCharts(dailyMap, totalDays, avgPaceVal) {
     baseData.push(((i + 1) * avgPaceVal).toFixed(1));
   }
 
+  // Calculate 7-Day Dynamic Projected Rate of Change (Local Derivative)
+  const dynamicRateData = barData.map((_, idx) => {
+    // Look back at preceding 7 days up to yesterday to get active local velocity
+    const windowStart = Math.max(0, idx - 7);
+    const windowEnd = Math.max(0, idx);
+    const windowSlice = barData.slice(windowStart, windowEnd);
+    
+    const local7DayRate = windowSlice.length > 0 
+      ? windowSlice.reduce((sum, val) => sum + val, 0) / windowSlice.length 
+      : barData[0];
+
+    const yesterdayCum = idx > 0 ? cumData[idx - 1] : 0;
+    const projectedToday = yesterdayCum + local7DayRate;
+    const actualToday = cumData[idx];
+
+    // Difference between actual cumulative total and the 7-day projected trajectory
+    return Number((actualToday - projectedToday).toFixed(2));
+  });
+
   if (cumChart) cumChart.destroy();
   const ctx1 = document.getElementById('cumulativeChart').getContext('2d');
   cumChart = new Chart(ctx1, {
@@ -521,6 +558,21 @@ function renderCharts(dailyMap, totalDays, avgPaceVal) {
           borderDash: [5, 5],
           pointRadius: 0,
           pointHoverRadius: 0,
+          pointHitRadius: 50,
+          yAxisID: 'yCumulative'
+        },
+        {
+          type: 'line',
+          label: '7-Day Dynamic Velocity Variance (+/-)',
+          data: dynamicRateData,
+          borderColor: '#3b82f6',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [3, 3],
+          tension: 0.3,
+          fill: false,
+          pointRadius: 0,
+          pointHoverRadius: 6,
           pointHitRadius: 50,
           yAxisID: 'yCumulative'
         },
@@ -552,7 +604,7 @@ function renderCharts(dailyMap, totalDays, avgPaceVal) {
           type: 'linear',
           position: 'right',
           max: maxDailyIncident * 3,
-          ticks: { color: '#f97316', stepSize: 1 },
+          ticks: { color: '#3b82f6' },
           grid: { drawOnChartArea: false }
         }
       }
