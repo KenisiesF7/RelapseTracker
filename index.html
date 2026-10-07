@@ -2,564 +2,689 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <meta name="theme-color" content="#121212">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Foul Tracker Pro - Dynamic Analytics</title>
+
+  <!-- PWA Headers & Manifest Link -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Foul Tracker</title>
+  <meta name="apple-mobile-web-app-title" content="FoulTracker">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
 
-  <link rel="manifest" id="manifest-placeholder">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
     :root {
-      --bg-color: #121212;
-      --card-bg: rgba(30, 30, 30, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --text-main: #f0f0f0;
-      --text-muted: #aaaaaa;
-      --accent-green: #4CAF50;
-      --accent-blue: #2196F3;
-      --accent-baseline: #888888;
-      --accent-red: #ff5252;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --accent-gold: #f59e0b;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
-
     body {
-      background-color: var(--bg-color);
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-dark);
       color: var(--text-main);
-      min-height: 100vh;
-      padding: 16px;
-      display: flex;
-      justify-content: center;
     }
-
-    .app-container {
-      width: 100%;
-      max-width: 960px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Top Bar */
+    .container { max-width: 1100px; margin: 0 auto; }
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px;
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-    }
-
-    h1 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      letter-spacing: -0.5px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Circular / Glass Buttons */
-    .btn {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .btn:active {
-      transform: scale(0.96);
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .btn-primary {
-      background: var(--accent-green);
-      color: #000;
-      font-weight: 600;
-      border: none;
-    }
-
-    .btn-danger {
-      background: rgba(255, 82, 82, 0.15);
-      color: var(--accent-red);
-      border: 1px solid rgba(255, 82, 82, 0.3);
-    }
-
-    /* Dashboard Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #334155;
+      flex-wrap: wrap;
       gap: 12px;
     }
-
-    .stat-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      padding: 18px;
-      border-radius: 16px;
-      text-align: center;
+    h1 { margin: 0; font-size: 1.8rem; color: #fff; }
+    .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+    
+    .motivation-banner {
+      background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+      border: 1px solid #10b981;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #ecfdf5;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     }
+    .motivation-text { font-size: 1.05rem; font-weight: 600; }
 
-    .stat-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
     }
-
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    /* Log Entry Section */
     .card {
       background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
       padding: 20px;
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
+    .card-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .card-value { font-size: 2rem; font-weight: bold; margin: 8px 0 4px 0; color: #fff; }
+    .card-sub { font-size: 0.8rem; color: var(--accent-green); }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .log-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      margin-bottom: 24px;
     }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    input[type="number"], input[type="file"] {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--card-border);
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 1rem;
+    .btn-foul {
       width: 100%;
+      padding: 18px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: white;
+      background: var(--accent-red);
+      cursor: pointer;
+      transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+    .btn-foul:active { transform: scale(0.98); background: #dc2626; }
+    
+    .btn-util {
+      padding: 8px 14px;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .btn-util:hover { background: #334155; }
+    .btn-notify { background: var(--accent-gold); color: #0f172a; font-weight: bold; border: none; }
+    .btn-install { background: var(--accent-blue); color: white; font-weight: bold; border: none; display: none; }
+    .btn-danger { background: var(--accent-red); color: white; font-weight: bold; border: none; }
+
+    .tag-select, .note-input {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
     }
 
-    /* Translucent Chart Containers */
-    .chart-box {
-      position: relative;
-      width: 100%;
-      height: 380px;
+    .chart-container { position: relative; height: 380px; margin-top: 16px; }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
     }
-
-    /* Data Tools Toolbar */
-    .tools-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    #fileInput {
-      display: none;
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #334155; font-size: 0.9rem; }
+    th { color: var(--text-muted); }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
-
-    <!-- Header -->
-    <header>
-      <h1>Foul Tracker</h1>
-      <div class="header-actions">
-        <button class="btn" id="alertBtn" onclick="requestNotificationPermission()">🔔 Alerts</button>
-        <button class="btn btn-primary hidden" id="installBtn" onclick="installPWA()">📲 Install</button>
-      </div>
-    </header>
-
-    <!-- Stats Dashboard -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Total Fouls</div>
-        <div class="stat-value" id="totalFoulsVal" style="color: var(--accent-green);">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Overall Daily Avg</div>
-        <div class="stat-value" id="overallAvgVal" style="color: var(--accent-baseline);">0.00</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">7-Day Rolling Avg</div>
-        <div class="stat-value" id="rollingAvgVal" style="color: var(--accent-blue);">0.00</div>
-      </div>
+<div class="container">
+  <header>
+    <div>
+      <h1>Foul Tracker Pro</h1>
+      <div class="subtitle">Behavior Analytics & Clean Streak Portal</div>
     </div>
-
-    <!-- Quick Log Panel -->
-    <div class="card">
-      <div class="card-title">Log Daily Count</div>
-      <div class="input-row">
-        <input type="number" id="foulInput" min="0" value="0" placeholder="Number of fouls">
-        <button class="btn btn-primary" onclick="logFouls()">Save Entry</button>
-      </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="btn-util btn-install" id="installBtn" onclick="installPWA()">📲 Install App</button>
+      <button class="btn-util btn-notify" onclick="enableMobileNotifications()">🔔 Alerts</button>
+      <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+      <button class="btn-util" onclick="document.getElementById('importFile').click()">Import</button>
+      <button class="btn-util" onclick="exportData('json')">Export JSON</button>
+      <button class="btn-util" onclick="exportData('csv')">Export CSV</button>
+      <button class="btn-util btn-danger" onclick="hardResetData()">🗑️ Reset Data</button>
     </div>
+  </header>
 
-    <!-- Main Cumulative & Rolling Average Timeline Chart -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Cumulative Progress & Rolling Trend</div>
-      </div>
-      <div class="chart-box">
-        <canvas id="mainChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Weekly Breakdown Chart -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Weekly Foul Breakdown</div>
-      </div>
-      <div class="chart-box">
-        <canvas id="weeklyChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Data Import / Export & Reset Tools -->
-    <div class="card">
-      <div class="card-title">Data Options & Backup</div>
-      <div class="tools-row">
-        <button class="btn" onclick="exportData()">📥 Export JSON</button>
-        <button class="btn" onclick="document.getElementById('fileInput').click()">📤 Import JSON</button>
-        <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
-        <button class="btn btn-danger" onclick="resetData()">🗑️ Reset All</button>
-      </div>
-    </div>
-
+  <!-- Motivational Banner -->
+  <div class="motivation-banner" id="motivationBanner">
+    <div class="motivation-text" id="motivationMsg">🔥 You're building momentum! Keep up the effort.</div>
   </div>
 
-  <script>
-    // --- 1. ORIENTATION & PWA MANIFEST INJECTION ---
-    const dynamicManifest = {
-      "name": "Foul Tracker",
-      "short_name": "FoulTracker",
-      "start_url": "./index.html",
-      "display": "standalone",
-      "orientation": "any",
-      "background_color": "#121212",
-      "theme_color": "#121212",
-      "icons": [
-        {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>",
-          "sizes": "192x192 512x512",
-          "type": "image/svg+xml"
-        }
-      ]
-    };
-    const manifestBlob = new Blob([JSON.stringify(dynamicManifest)], { type: 'application/json' });
-    document.getElementById('manifest-placeholder').setAttribute('href', URL.createObjectURL(manifestBlob));
+  <!-- Key Metrics -->
+  <div class="stats-grid">
+    <div class="card">
+      <div class="card-title">Total Cumulative Fouls</div>
+      <div class="card-value" id="totalFouls">0</div>
+      <div class="card-sub" id="averagePace">0.00 / day</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Current Clean Streak</div>
+      <div class="card-value" style="color: var(--accent-green);" id="currentStreak">0 Days</div>
+      <div class="card-sub">Active Streak</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Best Streak (2026 Record)</div>
+      <div class="card-value" style="color: #38bdf8;" id="bestStreak">0 Days</div>
+      <div class="card-sub" id="bestStreakSub">No Record Yet</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Clean Day Ratio</div>
+      <div class="card-value" id="cleanPercentage">0%</div>
+      <div class="card-sub" id="cleanDaysCount">0 of 0 days</div>
+    </div>
+  </div>
 
-    function unlockOrientation() {
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock().catch(() => {});
+  <!-- Real-time Logger -->
+  <div class="log-section">
+    <div class="card-title">Record Incident (Auto System Timestamp)</div>
+    <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+      <select id="tagSelect" class="tag-select" style="flex: 1;">
+        <option value="General">Tag: General / None</option>
+        <option value="Late Night">Tag: Late Night</option>
+        <option value="Stress">Tag: Stress / Anxiety</option>
+        <option value="Fatigue">Tag: Tired / Fatigue</option>
+        <option value="Boredom">Tag: Idle / Boredom</option>
+      </select>
+      <input type="text" id="noteInput" class="note-input" placeholder="Optional brief note..." style="flex: 2;">
+    </div>
+    <button class="btn-foul" onclick="logFoul()">+1 Foul (Log Instant)</button>
+  </div>
+
+  <!-- Combined Cumulative Line + Incident Bar Chart -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">2026 Cumulative Timeline (Line) & Daily Additions (Bottom 1/3 Bars)</div>
+    <div class="chart-container">
+      <canvas id="cumulativeChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Detailed Analytics Grid -->
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">Day-of-Week Distribution</div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="dowChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Time-of-Day Heatmap (1-Hour Windows)</div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="todChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Entries Table -->
+  <div class="card">
+    <div class="card-title">Recent Activity Log</div>
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Precise Local Time</th>
+            <th>Count</th>
+            <th>Context Tag</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody id="logTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let logs = [];
+let cumChart, dowChart, todChart;
+let deferredPrompt = null;
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+  });
+}
+
+// Catch Chrome/Android native install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const installBtn = document.getElementById('installBtn');
+  if (installBtn) installBtn.style.display = 'inline-block';
+});
+
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        document.getElementById('installBtn').style.display = 'none';
       }
-    }
-    window.addEventListener('load', unlockOrientation);
-    window.addEventListener('orientationchange', unlockOrientation);
-    document.addEventListener('touchstart', unlockOrientation, { once: true });
-
-
-    // --- 2. STATE MANAGEMENT & STORAGE ---
-    const STORAGE_KEY = 'foul_tracker_logs_v3';
-    let foulLogs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [1, 0, 2, 1, 0, 3, 0, 1, 2, 0, 0, 1, 4, 0];
-
-    function saveLogs() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(foulLogs));
-    }
-
-    function logFouls() {
-      const input = document.getElementById('foulInput');
-      const val = parseInt(input.value);
-      if (!isNaN(val) && val >= 0) {
-        foulLogs.push(val);
-        saveLogs();
-        input.value = '0';
-        renderApp();
-      }
-    }
-
-
-    // --- 3. CHARTS RENDERING ---
-    let mainChartInstance = null;
-    let weeklyChartInstance = null;
-
-    function renderApp() {
-      const totalFouls = foulLogs.reduce((a, b) => a + b, 0);
-      const totalDays = foulLogs.length || 1;
-      const overallAvg = totalFouls / totalDays;
-
-      const trailingSlice = foulLogs.slice(-7);
-      const rollingAvg = trailingSlice.reduce((a, b) => a + b, 0) / trailingSlice.length;
-
-      document.getElementById('totalFoulsVal').innerText = totalFouls;
-      document.getElementById('overallAvgVal').innerText = overallAvg.toFixed(2);
-      document.getElementById('rollingAvgVal').innerText = rollingAvg.toFixed(2);
-
-      renderMainChart(overallAvg);
-      renderWeeklyChart();
-    }
-
-    function renderMainChart(currentOverallAvg) {
-      const ctx = document.getElementById('mainChart').getContext('2d');
-
-      const labels = [];
-      const cumulativeData = [];
-      const baselineData = [];
-      const rollingAvgData = [];
-
-      let runningTotal = 0;
-
-      foulLogs.forEach((count, idx) => {
-        const dayNum = idx + 1;
-        labels.push(`Day ${dayNum}`);
-
-        // 1. Cumulative actual line
-        runningTotal += count;
-        cumulativeData.push(runningTotal);
-
-        // 2. Baseline line
-        baselineData.push(Number((currentOverallAvg * dayNum).toFixed(2)));
-
-        // 3. 7-Day Rolling Average
-        const windowStart = Math.max(0, idx - 6);
-        const slice = foulLogs.slice(windowStart, idx + 1);
-        const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
-        rollingAvgData.push(Number(avg.toFixed(2)));
-      });
-
-      if (mainChartInstance) mainChartInstance.destroy();
-
-      mainChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Cumulative Fouls',
-              data: cumulativeData,
-              borderColor: '#4CAF50',
-              backgroundColor: 'rgba(76, 175, 80, 0.1)',
-              borderWidth: 3,
-              fill: true,
-              tension: 0.1,
-              yAxisID: 'y'
-            },
-            {
-              label: 'Baseline Projection',
-              data: baselineData,
-              borderColor: '#888888',
-              borderDash: [5, 5],
-              borderWidth: 2,
-              pointRadius: 0,
-              yAxisID: 'y'
-            },
-            {
-              label: '7-Day Rolling Avg (Fouls/Day)',
-              data: rollingAvgData,
-              borderColor: '#2196F3',
-              backgroundColor: 'rgba(33, 150, 243, 0.08)',
-              borderWidth: 2,
-              tension: 0.3,
-              fill: true,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#aaa' }
-            },
-            y: {
-              type: 'linear',
-              position: 'left',
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#aaa' },
-              title: { display: true, text: 'Cumulative Total', color: '#4CAF50' }
-            },
-            y1: {
-              type: 'linear',
-              position: 'right',
-              grid: { drawOnChartArea: false },
-              ticks: { color: '#aaa' },
-              title: { display: true, text: 'Daily Rate (Rolling Avg)', color: '#2196F3' }
-            }
-          },
-          plugins: {
-            legend: { labels: { color: '#f0f0f0', usePointStyle: true } }
-          }
-        }
-      });
-    }
-
-    function renderWeeklyChart() {
-      const ctx = document.getElementById('weeklyChart').getContext('2d');
-
-      // Group logs into 7-day chunks (Week 1, Week 2, etc.)
-      const weeklyTotals = [];
-      const labels = [];
-      
-      for (let i = 0; i < foulLogs.length; i += 7) {
-        const weekSlice = foulLogs.slice(i, i + 7);
-        const sum = weekSlice.reduce((a, b) => a + b, 0);
-        const weekNum = Math.floor(i / 7) + 1;
-        labels.push(`Week ${weekNum}`);
-        weeklyTotals.push(sum);
-      }
-
-      if (weeklyChartInstance) weeklyChartInstance.destroy();
-
-      weeklyChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Total Fouls per Week',
-            data: weeklyTotals,
-            backgroundColor: 'rgba(33, 150, 243, 0.4)',
-            borderColor: '#2196F3',
-            borderWidth: 1,
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#aaa' } },
-            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#aaa' }, beginAtZero: true }
-          },
-          plugins: {
-            legend: { labels: { color: '#f0f0f0' } }
-          }
-        }
-      });
-    }
-
-
-    // --- 4. DATA IMPORT, EXPORT & RESET ---
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(foulLogs, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `foul_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    function importData(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            foulLogs = imported;
-            saveLogs();
-            renderApp();
-            alert("Data imported successfully!");
-          } else {
-            alert("Invalid format. Please upload a JSON file with an array of log numbers.");
-          }
-        } catch (err) {
-          alert("Error reading JSON file.");
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function resetData() {
-      if (confirm("Are you sure you want to delete all foul logs? This action cannot be undone.")) {
-        foulLogs = [];
-        saveLogs();
-        renderApp();
-      }
-    }
-
-
-    // --- 5. PWA INSTALL & NOTIFICATIONS ---
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installBtn').classList.remove('hidden');
+      deferredPrompt = null;
     });
+  } else {
+    alert("To install on iOS Safari:\nTap Share -> 'Add to Home Screen'.\n\nTo install on Chrome/Android:\nTap 3 dots menu -> 'Add to Home screen' or 'Install app'.");
+  }
+}
 
-    function installPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-          document.getElementById('installBtn').classList.add('hidden');
-        });
-      }
-    }
+async function enableMobileNotifications() {
+  if (!("Notification" in window)) {
+    alert("This browser does not support Web Notifications.");
+    return;
+  }
 
-    function requestNotificationPermission() {
-      if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-          alert(`Notifications: ${permission}`);
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      alert("✅ Notification permission granted!");
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        reg.showNotification("Foul Tracker Pro", {
+          body: "Notifications active! You will receive daily streak updates.",
+          icon: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
         });
       } else {
-        alert('Notifications not supported by this browser.');
+        new Notification("Foul Tracker Pro", {
+          body: "Notifications active!",
+          icon: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
+        });
+      }
+    } else if (permission === "denied") {
+      alert("❌ Notification permission was blocked. Please enable notification permissions in your browser/app settings.");
+    } else {
+      alert("Notification request dismissed.");
+    }
+  } catch (err) {
+    alert("Error requesting notification permissions: " + err.message);
+  }
+}
+
+function initData() {
+  const stored = localStorage.getItem('foulTrackerData');
+  if (stored !== null) {
+    logs = JSON.parse(stored);
+  } else {
+    logs = [];
+    localStorage.setItem('foulTrackerData', JSON.stringify([]));
+  }
+  refreshUI();
+}
+
+function hardResetData() {
+  const isConfirmed = confirm("⚠️ PERMANENT CLEAR ⚠️\n\nAre you sure you want to delete ALL logged data?\n\nThis cannot be undone unless you exported a JSON backup.");
+  if (!isConfirmed) return;
+
+  logs = [];
+  localStorage.setItem('foulTrackerData', JSON.stringify([]));
+  localStorage.removeItem('foulTrackerData');
+  sessionStorage.clear();
+
+  refreshUI();
+  alert("✓ All data wiped successfully.");
+}
+
+function logFoul() {
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0];
+  const tagStr = document.getElementById('tagSelect').value;
+  const noteStr = document.getElementById('noteInput').value;
+
+  const newEntry = {
+    id: 'log_' + Date.now(),
+    date: dateStr,
+    timestamp: now.toISOString(),
+    count: 1,
+    tag: tagStr,
+    note: noteStr
+  };
+
+  logs.push(newEntry);
+  localStorage.setItem('foulTrackerData', JSON.stringify(logs));
+  document.getElementById('noteInput').value = '';
+  refreshUI();
+}
+
+function formatLocalTimestamp(item) {
+  if (item.tag === 'Historical Log' || item.tag === 'Historical') {
+    return `${item.date} (Historical Log)`;
+  }
+  if (!item.timestamp) return item.date;
+  const dt = new Date(item.timestamp);
+  if (isNaN(dt.getTime())) return item.date;
+  return dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+function refreshUI() {
+  const totalCount = logs.reduce((sum, item) => sum + item.count, 0);
+  document.getElementById('totalFouls').innerText = totalCount;
+
+  const startDate = new Date('2026-01-01');
+  const now = new Date();
+  const totalDays = Math.max(1, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24)));
+  const avgPaceVal = totalCount / totalDays;
+  const avgPaceStr = avgPaceVal.toFixed(2);
+  document.getElementById('averagePace').innerText = `${avgPaceStr} fouls / day`;
+
+  const dailyMap = {};
+  logs.forEach(item => {
+    dailyMap[item.date] = (dailyMap[item.date] || 0) + item.count;
+  });
+
+  const loggedDaysCount = Object.keys(dailyMap).length;
+  const cleanDays = Math.max(0, totalDays - loggedDaysCount);
+  const cleanPct = totalDays > 0 ? ((cleanDays / totalDays) * 100).toFixed(1) : "0.0";
+
+  document.getElementById('cleanPercentage').innerText = `${cleanPct}%`;
+  document.getElementById('cleanDaysCount').innerText = `${cleanDays} clean out of ${totalDays} days`;
+
+  let activeStreak = 0;
+  let curr = new Date(now);
+  while (true) {
+    const dStr = curr.toISOString().split('T')[0];
+    if (dailyMap[dStr]) break;
+    activeStreak++;
+    curr.setDate(curr.getDate() - 1);
+    if (curr < startDate) break;
+  }
+  document.getElementById('currentStreak').innerText = `${activeStreak} Days`;
+
+  let maxStreak = 0;
+  let tempStreak = 0;
+  let bestStartStr = '';
+  let bestEndStr = '';
+  let tempStartStr = '';
+
+  let scanDate = new Date(startDate);
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  while (scanDate <= now) {
+    const sStr = scanDate.toISOString().split('T')[0];
+    if (!dailyMap[sStr]) {
+      if (tempStreak === 0) {
+        tempStartStr = `${monthNames[scanDate.getMonth()]} ${String(scanDate.getDate()).padStart(2, '0')}`;
+      }
+      tempStreak++;
+      if (tempStreak > maxStreak) {
+        maxStreak = tempStreak;
+        bestStartStr = tempStartStr;
+        bestEndStr = `${monthNames[scanDate.getMonth()]} ${String(scanDate.getDate()).padStart(2, '0')}`;
+      }
+    } else {
+      tempStreak = 0;
+    }
+    scanDate.setDate(scanDate.getDate() + 1);
+  }
+
+  document.getElementById('bestStreak').innerText = `${maxStreak} Days`;
+  if (maxStreak > 0) {
+    document.getElementById('bestStreakSub').innerText = `${bestStartStr} - ${bestEndStr}`;
+  } else {
+    document.getElementById('bestStreakSub').innerText = `No Record Yet`;
+  }
+
+  const msgEl = document.getElementById('motivationMsg');
+  if (logs.length === 0) {
+    msgEl.innerHTML = `✨ <strong>CLEAN SLATE!</strong> No entries logged yet. Ready when you are.`;
+  } else if (activeStreak >= 14) {
+    msgEl.innerHTML = `🏆 <strong>OUTSTANDING RECORD STREAK!</strong> You've reached ${activeStreak} clean days!`;
+  } else if (activeStreak >= 7) {
+    msgEl.innerHTML = `🔥 <strong>GREAT JOB!</strong> You're on a ${activeStreak}-day clean streak!`;
+  } else if (activeStreak >= 3) {
+    msgEl.innerHTML = `⭐ <strong>SOLID PROGRESS!</strong> ${activeStreak} consecutive clean days logged.`;
+  } else if (activeStreak === 0) {
+    msgEl.innerHTML = `💪 <strong>RESET & REFOCUS!</strong> Every clean streak starts with Day 1. You got this!`;
+  } else {
+    msgEl.innerHTML = `✨ <strong>DAY 1 CLEAN!</strong> Off to a good start today.`;
+  }
+
+  updateTable();
+  renderCharts(dailyMap, totalDays, avgPaceVal);
+}
+
+function updateTable() {
+  const tbody = document.getElementById('logTableBody');
+  tbody.innerHTML = '';
+  if (logs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No records found. Log an incident above or import data.</td></tr>';
+    return;
+  }
+  const sorted = [...logs].reverse().slice(0, 15);
+
+  sorted.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${formatLocalTimestamp(item)}</td>
+      <td><strong>+1</strong></td>
+      <td><span style="background:#334155; padding: 2px 8px; border-radius: 4px;">${item.tag}</span></td>
+      <td>${item.note || '-'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderCharts(dailyMap, totalDays, avgPaceVal) {
+  const labels = [];
+  const cumData = [];
+  const barData = [];
+  const baseData = [];
+  let running = 0;
+
+  const start = new Date('2026-01-01');
+  let maxDailyIncident = 1;
+
+  for (let i = 0; i < totalDays; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    const dStr = d.toISOString().split('T')[0];
+    const dayIncidents = dailyMap[dStr] || 0;
+    
+    if (dayIncidents > maxDailyIncident) maxDailyIncident = dayIncidents;
+
+    running += dayIncidents;
+    labels.push(dStr.slice(5));
+    cumData.push(running);
+    barData.push(dayIncidents);
+    baseData.push(((i + 1) * avgPaceVal).toFixed(1));
+  }
+
+  if (cumChart) cumChart.destroy();
+  const ctx1 = document.getElementById('cumulativeChart').getContext('2d');
+  cumChart = new Chart(ctx1, {
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Cumulative Total',
+          data: cumData,
+          borderColor: '#10b981',
+          borderWidth: 3,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointHitRadius: 50,
+          yAxisID: 'yCumulative'
+        },
+        {
+          type: 'line',
+          label: `Baseline Average (${avgPaceVal.toFixed(2)}/day)`,
+          data: baseData,
+          borderColor: '#64748b',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          pointHitRadius: 50,
+          yAxisID: 'yCumulative'
+        },
+        {
+          type: 'bar',
+          label: 'Daily Incidents',
+          data: barData,
+          backgroundColor: '#f97316',
+          yAxisID: 'yDaily'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', axis: 'x', intersect: false },
+      hover: { mode: 'index', axis: 'x', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#94a3b8' } },
+        tooltip: {
+          position: 'nearest',
+          callbacks: { title: function(items) { return 'Date: ' + items[0].label; } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#64748b', maxTicksLimit: 12 } },
+        yCumulative: { type: 'linear', position: 'left', ticks: { color: '#10b981' } },
+        yDaily: {
+          type: 'linear',
+          position: 'right',
+          max: maxDailyIncident * 3,
+          ticks: { color: '#f97316', stepSize: 1 },
+          grid: { drawOnChartArea: false }
+        }
       }
     }
+  });
 
-    // Initial Launch
-    renderApp();
-  </script>
+  const dowCounts = [0, 0, 0, 0, 0, 0, 0];
+  logs.forEach(item => {
+    const parts = item.date.split('-');
+    if (parts.length === 3) {
+      const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      dowCounts[d.getDay()] += item.count;
+    }
+  });
+
+  const maxDow = Math.max(...dowCounts);
+  const dowColors = dowCounts.map(val => (val === maxDow && maxDow > 0) ? '#ef4444' : '#3b82f6');
+
+  if (dowChart) dowChart.destroy();
+  const ctx2 = document.getElementById('dowChart').getContext('2d');
+  dowChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      datasets: [{ label: 'Fouls', data: dowCounts, backgroundColor: dowColors }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', axis: 'x', intersect: false },
+      hover: { mode: 'index', axis: 'x', intersect: false },
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }
+    }
+  });
+
+  const todCounts = new Array(24).fill(0);
+  let hasLiveLogs = false;
+
+  logs.forEach(item => {
+    if (item.tag !== 'Historical Log' && item.tag !== 'Historical' && item.timestamp) {
+      const dt = new Date(item.timestamp);
+      if (!isNaN(dt.getTime())) {
+        const h = dt.getHours();
+        todCounts[h] += item.count;
+        hasLiveLogs = true;
+      }
+    }
+  });
+
+  const todLabels = Array.from({length: 24}, (_, i) => {
+    const pad = String(i).padStart(2, '0');
+    return `${pad}:00–${pad}:59`;
+  });
+
+  if (todChart) todChart.destroy();
+  const ctx3 = document.getElementById('todChart').getContext('2d');
+  todChart = new Chart(ctx3, {
+    type: 'line',
+    data: {
+      labels: todLabels,
+      datasets: [{
+        label: 'Live Hourly Incidents',
+        data: todCounts,
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+        pointHoverRadius: 6,
+        pointHitRadius: 50
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', axis: 'x', intersect: false },
+      hover: { mode: 'index', axis: 'x', intersect: false },
+      plugins: {
+        legend: { display: true, labels: { color: '#94a3b8' } },
+        title: {
+          display: !hasLiveLogs,
+          text: 'No live timestamps yet. Heatmap populates as new entries are logged.',
+          color: '#94a3b8'
+        }
+      },
+      scales: { x: { ticks: { color: '#94a3b8', maxTicksLimit: 12 } }, y: { ticks: { color: '#94a3b8', stepSize: 1 } } }
+    }
+  });
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        logs = imported;
+        localStorage.setItem('foulTrackerData', JSON.stringify(logs));
+        refreshUI();
+        alert('Data imported successfully!');
+      }
+    } catch (err) {
+      alert('Invalid JSON file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function exportData(format) {
+  if (format === 'json') {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "foul_tracker_backup.json");
+    dlAnchor.click();
+  } else if (format === 'csv') {
+    let csvStr = "ID,Date,Timestamp,Count,Tag,Note\n";
+    logs.forEach(row => {
+      csvStr += `"${row.id}","${row.date}","${row.timestamp}",${row.count},"${row.tag}","${row.note}"\n`;
+    });
+    const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvStr);
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "foul_tracker.csv");
+    dlAnchor.click();
+  }
+}
+
+window.onload = initData;
+</script>
 </body>
 </html>
